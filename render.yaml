@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: cardpulse-backend
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: free
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
