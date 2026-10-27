@@ -1,23 +1,32 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+export function getApiBase() {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
+  }
+  if (typeof window !== "undefined" && window.location.hostname) {
+    // If running on localhost or phone network IP (e.g. 192.168.x.x:3001)
+    return `${window.location.protocol}//${window.location.hostname}:8080`;
+  }
+  return "http://localhost:8080";
+}
 
 const defaultHeaders = {
   "ngrok-skip-browser-warning": "true",
 };
 
 export async function fetchCards() {
-  const res = await fetch(`${API_BASE}/api/cards`, { headers: defaultHeaders });
+  const res = await fetch(`${getApiBase()}/api/cards`, { headers: defaultHeaders });
   if (!res.ok) throw new Error("Failed to load cards");
   return res.json();
 }
 
 export async function fetchConfig() {
-  const res = await fetch(`${API_BASE}/api/config`, { headers: defaultHeaders });
+  const res = await fetch(`${getApiBase()}/api/config`, { headers: defaultHeaders });
   if (!res.ok) throw new Error("Failed to load system config");
   return res.json();
 }
 
 export async function updateConfig(data) {
-  const res = await fetch(`${API_BASE}/api/config`, {
+  const res = await fetch(`${getApiBase()}/api/config`, {
     method: "POST",
     headers: { ...defaultHeaders, "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -32,7 +41,7 @@ export async function scanCardFile(file, engine = "auto", dewarp = true) {
   formData.append("engine", engine);
   formData.append("dewarp", String(dewarp));
 
-  const res = await fetch(`${API_BASE}/api/scan`, {
+  const res = await fetch(`${getApiBase()}/api/scan`, {
     method: "POST",
     headers: defaultHeaders,
     body: formData,
@@ -45,7 +54,7 @@ export async function scanCardFile(file, engine = "auto", dewarp = true) {
 }
 
 export async function scanCardBase64(base64Image, engine = "auto", dewarp = true) {
-  const res = await fetch(`${API_BASE}/api/scan-base64`, {
+  const res = await fetch(`${getApiBase()}/api/scan-base64`, {
     method: "POST",
     headers: { ...defaultHeaders, "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -62,13 +71,13 @@ export async function scanCardBase64(base64Image, engine = "auto", dewarp = true
 }
 
 export async function fetchSampleCards() {
-  const res = await fetch(`${API_BASE}/api/sample-cards`, { headers: defaultHeaders });
+  const res = await fetch(`${getApiBase()}/api/sample-cards`, { headers: defaultHeaders });
   if (!res.ok) throw new Error("Failed to load samples");
   return res.json();
 }
 
 export async function scanSampleCard(sampleId, engine = "auto", dewarp = true) {
-  const res = await fetch(`${API_BASE}/api/scan-sample/${sampleId}?engine=${engine}&dewarp=${dewarp}`, {
+  const res = await fetch(`${getApiBase()}/api/scan-sample/${sampleId}?engine=${engine}&dewarp=${dewarp}`, {
     method: "POST",
     headers: defaultHeaders,
   });
@@ -77,7 +86,7 @@ export async function scanSampleCard(sampleId, engine = "auto", dewarp = true) {
 }
 
 export async function reparseCard(cardId, engine = "auto") {
-  const res = await fetch(`${API_BASE}/api/cards/${cardId}/reparse?engine=${engine}`, {
+  const res = await fetch(`${getApiBase()}/api/cards/${cardId}/reparse?engine=${engine}`, {
     method: "POST",
     headers: defaultHeaders,
   });
@@ -86,7 +95,7 @@ export async function reparseCard(cardId, engine = "auto") {
 }
 
 export async function updateCard(cardId, data) {
-  const res = await fetch(`${API_BASE}/api/cards/${cardId}`, {
+  const res = await fetch(`${getApiBase()}/api/cards/${cardId}`, {
     method: "PUT",
     headers: { ...defaultHeaders, "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -96,7 +105,7 @@ export async function updateCard(cardId, data) {
 }
 
 export async function deleteCard(cardId) {
-  const res = await fetch(`${API_BASE}/api/cards/${cardId}`, {
+  const res = await fetch(`${getApiBase()}/api/cards/${cardId}`, {
     method: "DELETE",
     headers: defaultHeaders,
   });
@@ -105,7 +114,7 @@ export async function deleteCard(cardId) {
 }
 
 export async function clearAllCards() {
-  const res = await fetch(`${API_BASE}/api/cards`, {
+  const res = await fetch(`${getApiBase()}/api/cards`, {
     method: "DELETE",
     headers: defaultHeaders,
   });
@@ -115,29 +124,28 @@ export async function clearAllCards() {
 
 export function getCSVDownloadUrl(cardIds = null) {
   if (cardIds && cardIds.length > 0) {
-    return `${API_BASE}/api/export/csv?ids=${cardIds.join(",")}`;
+    return `${getApiBase()}/api/export/csv?ids=${cardIds.join(",")}`;
   }
-  return `${API_BASE}/api/export/csv`;
+  return `${getApiBase()}/api/export/csv`;
 }
 
 export function getSingleCardCSVUrl(cardId) {
-  return `${API_BASE}/api/cards/${cardId}/csv`;
+  return `${getApiBase()}/api/cards/${cardId}/csv`;
 }
 
 export function getExcelDownloadUrl(cardIds = null) {
   if (cardIds && cardIds.length > 0) {
-    return `${API_BASE}/api/export/excel?ids=${cardIds.join(",")}`;
+    return `${getApiBase()}/api/export/excel?ids=${cardIds.join(",")}`;
   }
-  return `${API_BASE}/api/export/excel`;
+  return `${getApiBase()}/api/export/excel`;
 }
 
 export function getSingleCardExcelUrl(cardId) {
-  return `${API_BASE}/api/cards/${cardId}/excel`;
+  return `${getApiBase()}/api/cards/${cardId}/excel`;
 }
-
 
 export function getImageUrl(path) {
   if (!path) return null;
   if (path.startsWith("http")) return path;
-  return `${API_BASE}${path}`;
+  return `${getApiBase()}${path}`;
 }
