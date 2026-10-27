@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { X, Save, Trash2, Copy, Check, ExternalLink, Image as ImageIcon, FileText, Zap, Sparkles, RefreshCw, ScanLine, Download, FileSpreadsheet } from "lucide-react";
+import { X, Save, Trash2, Copy, Check, ExternalLink, Image as ImageIcon, FileText, Zap, Sliders, RefreshCw, ScanLine, Download, FileSpreadsheet } from "lucide-react";
 import { updateCard, deleteCard, reparseCard, getImageUrl, getSingleCardCSVUrl, getSingleCardExcelUrl } from "../utils/api";
 
 
@@ -137,8 +136,8 @@ export default function CardDetailModal({ card, onClose, onUpdate, onDelete }) {
             <span className="badge badge-primary" style={{ fontSize: 10 }}>#{card.id}</span>
             <h3 style={{ fontSize: isMobileScreen ? 15 : 18, fontWeight: 700, whiteSpace: "nowrap" }}>Card Details</h3>
             {card.engine && (
-              <span className={`badge ${card.engine.includes("gemini") ? "badge-emerald" : "badge-primary"}`} style={{ fontSize: 9, padding: "1px 6px" }}>
-                {card.engine.includes("gemini") ? "🧠 Gemini" : "⚡ Vision ML"}
+              <span className="badge badge-primary" style={{ fontSize: 9, padding: "1px 6px" }}>
+                {card.engine.includes("apple_vision") ? "⚡ Vision ML" : "⚙️ Tesseract"}
               </span>
             )}
             {card.card_detected && (
@@ -253,13 +252,13 @@ export default function CardDetailModal({ card, onClose, onUpdate, onDelete }) {
                     <span>Apple Vision ML</span>
                   </button>
                   <button
-                    onClick={() => handleReparse("gemini")}
+                    onClick={() => handleReparse("tesseract")}
                     disabled={reparsing}
                     className="btn btn-secondary btn-sm"
                     style={{ flex: 1, padding: "6px 8px", fontSize: 11 }}
                   >
-                    <Sparkles size={12} color="#34d399" />
-                    <span>Gemini AI</span>
+                    <Sliders size={12} color="#94a3b8" />
+                    <span>Tesseract OCR</span>
                   </button>
                 </div>
               </div>

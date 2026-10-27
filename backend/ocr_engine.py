@@ -9,7 +9,6 @@ from PIL import Image, ImageEnhance, ImageOps
 import pytesseract
 
 from card_parser import parse_card_text
-from gemini_service import extract_card_with_gemini, get_active_gemini_key
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SCANNER_TOOL_BIN = os.path.join(BASE_DIR, "scanner_tool")
@@ -149,25 +148,14 @@ def run_apple_vision_scanner(image_bytes: bytes, dewarp: bool = True) -> Dict[st
 def run_card_scanner(
     image_bytes: bytes,
     engine: str = "auto",
-    dewarp: bool = True,
-    gemini_api_key: Optional[str] = None
+    dewarp: bool = True
 ) -> Dict[str, Any]:
     """
     Master Scanner & ML Pipeline:
-    - engine='gemini': Calls Google Gemini Vision AI.
     - engine='apple_vision': Calls Apple Vision ML (Neural Engine + Metal GPU dewarp).
     - engine='tesseract': Calls Tesseract OCR.
-    - engine='auto': Uses Gemini if key present, else Apple Vision ML, else Tesseract.
+    - engine='auto': Uses Apple Vision ML if available, else Tesseract OCR.
     """
-    key = gemini_api_key or get_active_gemini_key()
-
-    if engine == "gemini" or (engine == "auto" and key):
-        gemini_result = extract_card_with_gemini(image_bytes, api_key=key)
-        if gemini_result:
-            gemini_result["card_detected"] = False
-            gemini_result["dewarped_image_bytes"] = None
-            return gemini_result
-
     # Default to Apple Vision ML if available, else Tesseract
     if engine in ["auto", "apple_vision"] and os.path.exists(SCANNER_TOOL_BIN):
         return run_apple_vision_scanner(image_bytes, dewarp=dewarp)

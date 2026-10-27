@@ -99,11 +99,9 @@ export default function CameraScanner({
     setScanning(true);
     setLastDewarped(false);
     
-    const engineLabel = engine === "gemini"
-      ? "Google Gemini AI"
-      : engine === "apple_vision"
+    const engineLabel = engine === "apple_vision"
       ? "Apple Vision Neural Engine"
-      : "ML Pipeline";
+      : "Tesseract OCR";
 
     setStatusMessage(`Running ${engineLabel}...`);
 
@@ -177,7 +175,7 @@ export default function CameraScanner({
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <h2 style={{ fontSize: 15, fontWeight: 700, whiteSpace: "nowrap" }}>Live Camera</h2>
               <span className="badge badge-primary" style={{ fontSize: 10, padding: "1px 6px" }}>
-                {engine === "gemini" ? "🧠 Gemini" : engine === "apple_vision" ? "⚡ Neural" : "⚡ ML"}
+                {engine === "apple_vision" ? "⚡ Neural" : "⚙️ Tesseract"}
               </span>
             </div>
             <p style={{ fontSize: 11, color: "var(--text-muted)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>

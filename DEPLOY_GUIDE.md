@@ -40,10 +40,8 @@ Your local git repository is already initialized and committed on branch `main`.
    - **Root Directory:** `backend`
    - **Runtime:** `Docker`
    - **Instance Type:** `Free` ($0/month)
-5. *(Optional)* In **Environment Variables**, add:
-   - `GEMINI_API_KEY`: *(Your Google AI Studio Gemini API key, or leave blank to set later in the UI)*
-6. Click **Deploy Web Service**.
-7. Render will automatically build the container (installing Python, FastAPI, and Tesseract OCR). Once deployment finishes, copy your live backend URL:
+5. Click **Deploy Web Service**.
+6. Render will automatically build the container (installing Python, FastAPI, and Tesseract OCR). Once deployment finishes, copy your live backend URL:
    ```
    https://cardpulse-backend-xxxx.onrender.com
    ```

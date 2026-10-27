@@ -25,7 +25,6 @@ export default function HomePage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [config, setConfig] = useState({
     apple_vision_ml_available: true,
-    gemini_available: false,
     default_engine: "apple_vision"
   });
 
@@ -48,8 +47,6 @@ export default function HomePage() {
         setConfig(configData);
         if (!configData.apple_vision_ml_available && configData.default_engine) {
           setSelectedEngine(configData.default_engine);
-        } else if (configData.gemini_available && selectedEngine === "auto") {
-          setSelectedEngine("gemini");
         }
       }
       setBackendStatus("online");
@@ -65,11 +62,9 @@ export default function HomePage() {
 
   const handleCardScanned = (newCard) => {
     setCards((prev) => [newCard, ...prev.filter((c) => c.id !== newCard.id)]);
-    const engineLabel = newCard.engine?.includes("gemini")
-      ? "Google Gemini AI"
-      : newCard.engine?.includes("apple_vision")
+    const engineLabel = newCard.engine?.includes("apple_vision")
       ? "Apple Vision ML"
-      : "ML Scanner";
+      : "Tesseract OCR";
     
     const dewarpNote = newCard.card_detected ? " (Dewarpped)" : "";
     showCardNotification(newCard, engineLabel, dewarpNote);
@@ -182,16 +177,10 @@ export default function HomePage() {
         {/* ML Scanner Engine Selector Bar */}
         <EngineSelectorBar
           selectedEngine={selectedEngine}
-          onSelectEngine={(eng) => {
-            setSelectedEngine(eng);
-            if (eng === "gemini" && !config.gemini_available) {
-              setIsSettingsOpen(true);
-            }
-          }}
+          onSelectEngine={(eng) => setSelectedEngine(eng)}
           autoDewarp={autoDewarp}
           onToggleDewarp={(val) => setAutoDewarp(val)}
           onOpenSettings={() => setIsSettingsOpen(true)}
-          geminiAvailable={config.gemini_available}
         />
 
         {/* Sample card test banner */}
@@ -264,7 +253,7 @@ export default function HomePage() {
         color: "var(--text-dim)",
         background: "rgba(9, 13, 22, 0.6)"
       }}>
-        CardPulse Business Card Scanner • Apple Vision ML & Google Gemini AI + Next.js • RFC-4180 CSV
+        CardPulse Business Card Scanner • Apple Vision ML & Tesseract OCR + Next.js • RFC-4180 CSV
       </footer>
     </div>
   );

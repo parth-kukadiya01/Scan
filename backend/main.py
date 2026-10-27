@@ -13,11 +13,10 @@ from csv_service import generate_csv_bytes
 from excel_service import generate_excel_bytes
 import storage
 from sample_cards import SAMPLE_PRESETS, generate_sample_card_image
-from gemini_service import get_active_gemini_key, set_gemini_key
 
 app = FastAPI(
     title="CardPulse Smart ML Business Card Scanner API",
-    description="Intelligent Card Scanner with Apple Vision Neural Engine, Google Gemini AI, and Tesseract OCR"
+    description="Intelligent Card Scanner with Apple Vision Neural Engine ML and Tesseract OCR"
 )
 
 app.add_middleware(
@@ -44,37 +43,22 @@ class UpdateCardRequest(BaseModel):
     other_details: Optional[str] = None
     raw_text: Optional[str] = None
 
-class ConfigRequest(BaseModel):
-    gemini_api_key: Optional[str] = None
-
 @app.get("/")
 def read_root():
     return {
         "status": "online",
         "service": "CardPulse Smart Business Card Scanner Backend",
         "apple_vision_ml_available": os.path.exists(SCANNER_TOOL_BIN),
-        "has_gemini_key": bool(get_active_gemini_key())
+        "tesseract_available": True
     }
 
 @app.get("/api/config")
 def get_system_config():
     """Returns engine availability and configuration status."""
-    has_gemini = bool(get_active_gemini_key())
     has_apple_vision = os.path.exists(SCANNER_TOOL_BIN)
     return {
         "apple_vision_ml_available": has_apple_vision,
-        "gemini_available": has_gemini,
-        "default_engine": "gemini" if has_gemini else ("apple_vision" if has_apple_vision else "tesseract")
-    }
-
-@app.post("/api/config")
-def update_system_config(payload: ConfigRequest):
-    """Allows user to set or clear their Gemini API Key."""
-    if payload.gemini_api_key is not None:
-        set_gemini_key(payload.gemini_api_key.strip())
-    return {
-        "success": True,
-        "has_gemini_key": bool(get_active_gemini_key())
+        "default_engine": "apple_vision" if has_apple_vision else "tesseract"
     }
 
 @app.get("/api/cards")
@@ -90,7 +74,7 @@ async def scan_uploaded_file(
 ):
     """
     Scans an uploaded business card image.
-    Uses Apple Vision Neural Engine / Gemini AI with document perspective dewarping.
+    Uses Apple Vision Neural Engine / Tesseract OCR with document perspective dewarping.
     Appends the card directly to the cumulative CSV.
     """
     contents = await file.read()

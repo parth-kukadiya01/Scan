@@ -8,8 +8,7 @@ export default function EngineSelectorBar({
   onSelectEngine,
   autoDewarp,
   onToggleDewarp,
-  onOpenSettings,
-  geminiAvailable
+  onOpenSettings
 }) {
   const engines = [
     {
@@ -21,17 +20,9 @@ export default function EngineSelectorBar({
       desc: "Instant macOS Neural OCR + Metal GPU Dewarp"
     },
     {
-      id: "gemini",
-      name: "Google Gemini AI",
-      badge: geminiAvailable ? "Configured" : "Key Needed",
-      icon: Sparkles,
-      accent: "#34d399",
-      desc: "Multimodal Generative Vision LLM"
-    },
-    {
       id: "tesseract",
       name: "Tesseract OCR",
-      badge: "Legacy",
+      badge: "Universal",
       icon: Sliders,
       accent: "#94a3b8",
       desc: "Standard Open-Source OCR Engine"

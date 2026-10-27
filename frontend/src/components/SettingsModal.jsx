@@ -6,15 +6,12 @@ import { fetchConfig, updateConfig, getApiBase } from "../utils/api";
 import { Link2 } from "lucide-react";
 
 export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
-  const [geminiKey, setGeminiKey] = useState("");
   const [backendUrl, setBackendUrl] = useState("");
   const [config, setConfig] = useState({
     apple_vision_ml_available: true,
-    gemini_available: false,
     default_engine: "apple_vision"
   });
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [savingUrl, setSavingUrl] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
 
@@ -59,30 +56,6 @@ export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
     loadConfig();
     if (onConfigSaved) onConfigSaved();
     setSavingUrl(false);
-  };
-
-
-  const handleSaveKey = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    setStatusMessage(null);
-    try {
-      const res = await updateConfig({ gemini_api_key: geminiKey.trim() });
-      setConfig((prev) => ({
-        ...prev,
-        gemini_available: res.has_gemini_key
-      }));
-      setStatusMessage({
-        type: "success",
-        text: geminiKey.trim() ? "Gemini API Key saved and activated!" : "API Key cleared. Using Apple Vision ML."
-      });
-      if (onConfigSaved) onConfigSaved();
-      setGeminiKey("");
-    } catch (err) {
-      setStatusMessage({ type: "error", text: err.message || "Failed to save key" });
-    } finally {
-      setSaving(false);
-    }
   };
 
   if (!isOpen) return null;
@@ -171,21 +144,19 @@ export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
               </p>
             </div>
 
-            {/* Google Gemini AI */}
+            {/* Tesseract OCR Engine */}
             <div style={{
               padding: 14,
               borderRadius: "var(--radius-md)",
-              background: config.gemini_available ? "rgba(16, 185, 129, 0.08)" : "rgba(255, 255, 255, 0.03)",
-              border: `1px solid ${config.gemini_available ? "rgba(16, 185, 129, 0.3)" : "var(--border-subtle)"}`
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid var(--border-subtle)"
             }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0" }}>Google Gemini AI</span>
-                <span className={`badge ${config.gemini_available ? "badge-emerald" : ""}`} style={{ fontSize: 10, padding: "2px 6px" }}>
-                  {config.gemini_available ? "Configured" : "Optional"}
-                </span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0" }}>Tesseract OCR</span>
+                <span className="badge" style={{ fontSize: 10, padding: "2px 6px" }}>Universal</span>
               </div>
               <p style={{ fontSize: 11, color: "var(--text-muted)", margin: 0 }}>
-                Multimodal 2.5 Flash Vision. Perfect on complex layouts & multilingual cards.
+                Open-source fallback engine for Linux containers & Docker deployments.
               </p>
             </div>
           </div>
@@ -211,8 +182,8 @@ export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
           )}
 
           {/* Backend API Server URL Form (Especially for Vercel Deployments) */}
-          <form onSubmit={handleSaveBackendUrl} style={{ marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid var(--border-subtle)" }}>
-            <div style={{ marginBottom: 12 }}>
+          <form onSubmit={handleSaveBackendUrl}>
+            <div style={{ marginBottom: 16 }}>
               <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
                 <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <Link2 size={14} color="#34d399" />
@@ -244,37 +215,6 @@ export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
                 Required when running on Vercel. Connects this browser to your live FastAPI backend.
               </p>
             </div>
-          </form>
-
-          {/* Gemini API Key Form */}
-          <form onSubmit={handleSaveKey}>
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
-                <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <Key size={14} color="#818cf8" />
-                  Google Gemini API Key
-                </span>
-                <a
-                  href="https://aistudio.google.com/app/apikey"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ fontSize: 11, color: "#818cf8", textDecoration: "none" }}
-                >
-                  Get free key ↗
-                </a>
-              </label>
-              <input
-                type="password"
-                placeholder={config.gemini_available ? "••••••••••••••••••••••••••••••••" : "Paste AIzaSy... key from Google AI Studio"}
-                value={geminiKey}
-                onChange={(e) => setGeminiKey(e.target.value)}
-                className="input-field"
-                style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}
-              />
-              <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 6 }}>
-                Leave empty and click Save to clear your key and use native Apple Vision ML.
-              </p>
-            </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
               <button
@@ -283,23 +223,6 @@ export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
                 className="btn btn-secondary"
               >
                 Close
-              </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="btn btn-primary"
-              >
-                {saving ? (
-                  <>
-                    <RefreshCw size={14} className="spinner" />
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <Check size={14} />
-                    <span>Save Key</span>
-                  </>
-                )}
               </button>
             </div>
           </form>

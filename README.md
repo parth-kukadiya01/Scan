@@ -1,6 +1,6 @@
 # CardPulse - Smart ML Business Card Scanner & CSV Exporter
 
-An intelligent, full-stack Business Card Scanner application powered by **Apple Vision Neural Engine ML**, **Google Gemini Multimodal AI**, and **Metal GPU Perspective Dewarping** with a high-performance **Next.js (Turbopack + Vanilla CSS)** frontend.
+An intelligent, full-stack Business Card Scanner application powered by **Apple Vision Neural Engine ML**, **Tesseract OCR**, and **Metal GPU Perspective Dewarping** with a high-performance **Next.js (Turbopack + Vanilla CSS)** frontend.
 
 Designed to scan business cards one by one (via live camera or batch file upload), automatically detect card edges, dewarp perspective into clean rectangular scans, extract structured contact information with near-100% accuracy, preserve unaltered raw OCR text, and maintain a cumulative CSV file ready for download.
 
@@ -14,10 +14,9 @@ Designed to scan business cards one by one (via live camera or batch file upload
   - Document illumination and contrast optimization to eliminate shadows and glare.
   - Dual image storage: saves both the original photo and the clean dewarped scan.
 
-- **Dual/Triple ML Extraction Pipeline**:
+- **Dual ML Extraction Pipeline**:
   - ⚡ **Apple Vision ML (Neural Engine)**: Native macOS Neural Engine OCR running locally with zero latency, zero cost, and 100% offline privacy.
-  - 🧠 **Google Gemini Vision AI**: Direct multimodal 2.5 Flash / 1.5 Flash vision extraction for complex, artistic, multi-language, or handwritten cards.
-  - ⚙️ **Enhanced Tesseract OCR**: Universal fallback engine with multi-PSM segmentation voting.
+  - ⚙️ **Enhanced Tesseract OCR**: Universal open-source fallback engine for Linux containers and cloud deployments.
 
 - **2D Spatial Layout & NLP Information Extractor**:
   - Uses bounding-box spatial coordinates $(x, y, w, h)$ to separate multi-column layouts.
@@ -45,15 +44,15 @@ Designed to scan business cards one by one (via live camera or batch file upload
 - **Obsidian Glassmorphic UI**:
   - Rich obsidian theme (`#090d16`), electric indigo & emerald accents, sound effects via Web Audio API, and confetti bursts on export.
   - Before/After dewarped image switcher in card details modal.
-  - 1-Click "Re-Analyze Card" with Gemini AI or Apple Vision ML.
+  - 1-Click "Re-Analyze Card" with Apple Vision ML or Tesseract OCR.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Python 3.14, FastAPI, Uvicorn, Apple Vision Framework (Swift 6), CoreImage Metal GPU, Pytesseract, Pillow, Pydantic
+- **Backend**: Python 3.11/3.14, FastAPI, Uvicorn, Apple Vision Framework (Swift 6), CoreImage Metal GPU, Pytesseract, Pillow, Pydantic
 - **Frontend**: Next.js 16 (Turbopack), React 19, Lucide Icons, Canvas Confetti, Vanilla CSS
-- **ML Engines**: Apple Vision Neural Engine (`VNRecognizeTextRequest`), Google Gemini Vision API
+- **ML Engines**: Apple Vision Neural Engine (`VNRecognizeTextRequest`), Tesseract OCR
 
 ---
 
@@ -105,7 +104,6 @@ scaner/
 │   ├── scanner_tool.swift   # Native Apple Vision + CoreImage Metal GPU dewarper
 │   ├── scanner_tool         # Compiled ARM64 native binary (<50ms execution)
 │   ├── card_parser.py       # 2D spatial layout and NLP entity extractor
-│   ├── gemini_service.py    # Google Gemini Vision API integration
 │   ├── csv_service.py       # RFC-4180 CSV builder with UTF-8 BOM
 │   ├── storage.py           # Persistent card storage (original + dewarped images)
 │   ├── sample_cards.py      # Programmatic test card generator
@@ -122,7 +120,7 @@ scaner/
 │   │   ├── components/
 │   │   │   ├── Navbar.jsx            # Header & CSV download button
 │   │   │   ├── EngineSelectorBar.jsx # ML engine selector & Dewarp toggle
-│   │   │   ├── SettingsModal.jsx     # Gemini API key & engine configuration
+│   │   │   ├── SettingsModal.jsx     # Backend URL & engine configuration
 │   │   │   ├── CameraScanner.jsx     # Live camera viewfinder & laser
 │   │   │   ├── FileUploader.jsx      # Drag & drop multi-card queue
 │   │   │   ├── SampleCardsBanner.jsx # 1-click test cards

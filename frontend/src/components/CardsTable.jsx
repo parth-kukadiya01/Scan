@@ -513,11 +513,11 @@ export default function CardsTable({
                       )}
 
                       <div style={{ display: "flex", gap: 4, marginTop: 4, flexWrap: "wrap" }}>
-                        {card.engine?.includes("gemini") ? (
-                          <span className="badge badge-emerald" style={{ fontSize: 9, padding: "1px 5px" }}>🧠 Gemini</span>
-                        ) : card.engine?.includes("apple_vision") ? (
+                        {card.engine?.includes("apple_vision") ? (
                           <span className="badge badge-primary" style={{ fontSize: 9, padding: "1px 5px" }}>⚡ Vision ML</span>
-                        ) : null}
+                        ) : (
+                          <span className="badge" style={{ fontSize: 9, padding: "1px 5px" }}>⚙️ Tesseract</span>
+                        )}
                         {card.card_detected && (
                           <span className="badge" style={{ fontSize: 9, padding: "1px 5px", background: "rgba(16, 185, 129, 0.15)", color: "#34d399", borderColor: "rgba(16, 185, 129, 0.3)" }}>
                             📐 Dewarped
@@ -718,11 +718,11 @@ export default function CardsTable({
                         <span style={{ fontWeight: 700, color: "var(--text-main)", fontSize: 13 }}>
                           {card.name || <span style={{ color: "var(--text-dim)", fontStyle: "italic" }}>Not detected</span>}
                         </span>
-                        {card.engine?.includes("gemini") ? (
-                          <span className="badge badge-emerald" style={{ fontSize: 9, padding: "1px 5px" }}>🧠 Gemini</span>
-                        ) : card.engine?.includes("apple_vision") ? (
+                        {card.engine?.includes("apple_vision") ? (
                           <span className="badge badge-primary" style={{ fontSize: 9, padding: "1px 5px" }}>⚡ Neural ML</span>
-                        ) : null}
+                        ) : (
+                          <span className="badge" style={{ fontSize: 9, padding: "1px 5px" }}>⚙️ Tesseract</span>
+                        )}
                         {card.card_detected && (
                           <span className="badge" style={{ fontSize: 9, padding: "1px 5px", background: "rgba(16, 185, 129, 0.15)", color: "#34d399", borderColor: "rgba(16, 185, 129, 0.3)" }}>
                             📐 Dewarped
