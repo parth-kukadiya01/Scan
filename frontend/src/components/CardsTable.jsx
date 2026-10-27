@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Download, Search, Trash2, Edit3, Eye, Copy, Check, FileSpreadsheet, Building2, Phone, Mail, Globe, MapPin, CheckSquare, Square, MinusSquare, LayoutGrid, Table as TableIcon } from "lucide-react";
 import confetti from "canvas-confetti";
-import { getCSVDownloadUrl, getSingleCardCSVUrl, getImageUrl } from "../utils/api";
+import { getCSVDownloadUrl, getSingleCardCSVUrl, getExcelDownloadUrl, getSingleCardExcelUrl, getImageUrl } from "../utils/api";
 
 export default function CardsTable({
   cards = [],
@@ -64,11 +64,23 @@ export default function CardsTable({
   const isAllSelected = filteredCards.length > 0 && filteredCards.every((c) => selectedIds.includes(c.id));
   const isPartiallySelected = filteredCards.some((c) => selectedIds.includes(c.id)) && !isAllSelected;
 
-  // Download All Cards as CSV
-  const handleDownloadAll = () => {
+  // Download All Cards as Formatted Excel (.xlsx)
+  const handleDownloadAllExcel = () => {
     if (cards.length === 0) return;
     confetti({
-      particleCount: 80,
+      particleCount: 90,
+      spread: 75,
+      origin: { y: 0.3 },
+      colors: ['#107c41', '#10b981', '#34d399', '#6ee7b7']
+    });
+    window.location.href = getExcelDownloadUrl();
+  };
+
+  // Download All Cards as CSV
+  const handleDownloadAllCSV = () => {
+    if (cards.length === 0) return;
+    confetti({
+      particleCount: 75,
       spread: 70,
       origin: { y: 0.3 },
       colors: ['#6366f1', '#10b981', '#06b6d4', '#f59e0b']
@@ -76,11 +88,23 @@ export default function CardsTable({
     window.location.href = getCSVDownloadUrl();
   };
 
-  // Download Specific Selected Cards as CSV
-  const handleDownloadSelected = () => {
+  // Download Specific Selected Cards as Formatted Excel (.xlsx)
+  const handleDownloadSelectedExcel = () => {
     if (selectedIds.length === 0) return;
     confetti({
-      particleCount: 90,
+      particleCount: 95,
+      spread: 80,
+      origin: { y: 0.3 },
+      colors: ['#107c41', '#10b981', '#34d399', '#a7f3d0']
+    });
+    window.location.href = getExcelDownloadUrl(selectedIds);
+  };
+
+  // Download Specific Selected Cards as CSV
+  const handleDownloadSelectedCSV = () => {
+    if (selectedIds.length === 0) return;
+    confetti({
+      particleCount: 85,
       spread: 75,
       origin: { y: 0.3 },
       colors: ['#10b981', '#6366f1', '#3b82f6', '#f59e0b']
@@ -88,17 +112,30 @@ export default function CardsTable({
     window.location.href = getCSVDownloadUrl(selectedIds);
   };
 
-  // Download a Single Specific Card as CSV
-  const handleDownloadSingleCard = (cardId, e) => {
+  // Download a Single Specific Card as Formatted Excel (.xlsx)
+  const handleDownloadSingleCardExcel = (cardId, e) => {
     e.stopPropagation();
     confetti({
       particleCount: 50,
       spread: 60,
       origin: { y: 0.35 },
-      colors: ['#10b981', '#34d399', '#6366f1']
+      colors: ['#107c41', '#10b981', '#34d399']
+    });
+    window.location.href = getSingleCardExcelUrl(cardId);
+  };
+
+  // Download a Single Specific Card as CSV
+  const handleDownloadSingleCardCSV = (cardId, e) => {
+    e.stopPropagation();
+    confetti({
+      particleCount: 45,
+      spread: 55,
+      origin: { y: 0.35 },
+      colors: ['#6366f1', '#10b981', '#38bdf8']
     });
     window.location.href = getSingleCardCSVUrl(cardId);
   };
+
 
   const copyCSVToClipboard = async () => {
     if (cards.length === 0) return;
@@ -207,16 +244,29 @@ export default function CardsTable({
               <span>{copiedCsv ? "Copied" : selectedIds.length > 0 ? `Copy (${selectedIds.length})` : "Copy CSV"}</span>
             </button>
 
+
+            {/* Download All Formatted Excel (.xlsx) */}
+            <button
+              onClick={handleDownloadAllExcel}
+              disabled={cards.length === 0}
+              className="btn btn-excel btn-sm"
+              title="Download formatted Excel (.xlsx) with styled headers & auto-filters"
+              style={{ padding: "6px 11px", minHeight: 36, fontSize: 12, fontWeight: 700 }}
+            >
+              <FileSpreadsheet size={13} />
+              <span>All Excel</span>
+            </button>
+
             {/* Download All CSV */}
             <button
-              onClick={handleDownloadAll}
+              onClick={handleDownloadAllCSV}
               disabled={cards.length === 0}
-              className="btn btn-emerald btn-sm"
+              className="btn btn-secondary btn-sm"
               title="Download full CSV with all cards"
               style={{ padding: "6px 10px", minHeight: 36, fontSize: 12 }}
             >
               <Download size={13} />
-              <span>All CSV</span>
+              <span>CSV</span>
             </button>
 
             {/* Clear All */}
@@ -248,29 +298,41 @@ export default function CardsTable({
           flexWrap: "wrap",
           gap: 10,
           padding: "10px 14px",
-          background: "linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(99, 102, 241, 0.15))",
-          border: "1px solid rgba(16, 185, 129, 0.35)",
+          background: "linear-gradient(90deg, rgba(16, 124, 65, 0.2), rgba(99, 102, 241, 0.15))",
+          border: "1px solid rgba(34, 197, 94, 0.4)",
           borderRadius: "var(--radius-md)",
           marginBottom: 14
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span className="badge badge-emerald" style={{ fontSize: 11, padding: "2px 7px" }}>
+            <span className="badge badge-excel" style={{ fontSize: 11, padding: "2px 8px", fontWeight: 700 }}>
               {selectedIds.length} of {cards.length} Selected
             </span>
             <span className="hide-on-small-mobile" style={{ fontSize: 12, color: "#e2e8f0", fontWeight: 600 }}>
-              Specific export ready
+              Export ready
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", width: "100%", maxWidth: 360 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", width: "100%", maxWidth: 440 }}>
+            {/* Export Selected Excel */}
             <button
-              onClick={handleDownloadSelected}
-              className="btn btn-emerald btn-sm"
+              onClick={handleDownloadSelectedExcel}
+              className="btn btn-excel btn-sm"
               style={{ fontWeight: 700, flex: "1 1 auto", minHeight: 32, fontSize: 11 }}
+              title="Download formatted Excel (.xlsx) for selected cards"
+            >
+              <FileSpreadsheet size={13} />
+              <span>Export ({selectedIds.length}) Excel</span>
+            </button>
+
+            {/* Export Selected CSV */}
+            <button
+              onClick={handleDownloadSelectedCSV}
+              className="btn btn-secondary btn-sm"
+              style={{ fontWeight: 600, flex: "1 1 auto", minHeight: 32, fontSize: 11 }}
               title="Download CSV containing only the checked cards"
             >
               <Download size={13} />
-              <span>Export ({selectedIds.length}) CSV</span>
+              <span>CSV ({selectedIds.length})</span>
             </button>
 
             <button
@@ -280,6 +342,7 @@ export default function CardsTable({
             >
               Deselect
             </button>
+
 
             <button
               onClick={handleDeleteSelected}
@@ -504,12 +567,21 @@ export default function CardsTable({
                   </div>
 
                   {/* Quick Card Action Buttons */}
-                  <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
                     <button
-                      onClick={(e) => handleDownloadSingleCard(card.id, e)}
-                      className="btn btn-emerald btn-sm"
-                      style={{ flex: 1, padding: "5px 8px", fontSize: 11, minHeight: 32 }}
-                      title="Download this card as CSV"
+                      onClick={(e) => handleDownloadSingleCardExcel(card.id, e)}
+                      className="btn btn-excel btn-sm"
+                      style={{ flex: 1, padding: "5px 6px", fontSize: 11, minHeight: 32, fontWeight: 700 }}
+                      title="Download formatted Excel (.xlsx)"
+                    >
+                      <FileSpreadsheet size={12} />
+                      <span>Excel</span>
+                    </button>
+                    <button
+                      onClick={(e) => handleDownloadSingleCardCSV(card.id, e)}
+                      className="btn btn-secondary btn-sm"
+                      style={{ flex: 1, padding: "5px 6px", fontSize: 11, minHeight: 32 }}
+                      title="Download card CSV"
                     >
                       <Download size={12} />
                       <span>CSV</span>
@@ -517,21 +589,21 @@ export default function CardsTable({
                     <button
                       onClick={() => onSelectCard(card)}
                       className="btn btn-secondary btn-sm"
-                      style={{ flex: 1, padding: "5px 8px", fontSize: 11, minHeight: 32 }}
+                      style={{ padding: "5px 8px", fontSize: 11, minHeight: 32 }}
                       title="View & Edit"
                     >
                       <Eye size={12} />
-                      <span>Details</span>
                     </button>
                     <button
                       onClick={() => onDeleteCard(card.id)}
                       className="btn btn-danger btn-sm"
-                      style={{ padding: "5px 9px", minHeight: 32 }}
+                      style={{ padding: "5px 8px", minHeight: 32 }}
                       title="Delete card"
                     >
-                      <Trash2 size={13} />
+                      <Trash2 size={12} />
                     </button>
                   </div>
+
                 </div>
               );
             })}
@@ -721,10 +793,19 @@ export default function CardsTable({
                     <td style={{ padding: "10px 14px", textAlign: "right", whiteSpace: "nowrap" }}>
                       <div style={{ display: "flex", justifyContent: "flex-end", gap: 5 }}>
                         <button
-                          onClick={(e) => handleDownloadSingleCard(card.id, e)}
-                          className="btn btn-emerald btn-sm"
+                          onClick={(e) => handleDownloadSingleCardExcel(card.id, e)}
+                          className="btn btn-excel btn-sm"
                           style={{ padding: "5px 8px" }}
-                          title="Download this specific card as CSV"
+                          title="Download this card as formatted Excel (.xlsx)"
+                        >
+                          <FileSpreadsheet size={13} />
+                        </button>
+
+                        <button
+                          onClick={(e) => handleDownloadSingleCardCSV(card.id, e)}
+                          className="btn btn-secondary btn-sm"
+                          style={{ padding: "5px 8px" }}
+                          title="Download this card as standard CSV"
                         >
                           <Download size={13} />
                         </button>
@@ -748,6 +829,7 @@ export default function CardsTable({
                         </button>
                       </div>
                     </td>
+
                   </tr>
                 );
               })}

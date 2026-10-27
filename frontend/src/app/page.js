@@ -211,12 +211,14 @@ export default function HomePage() {
       {/* Detail / Verification Modal */}
       {selectedCard && (
         <CardDetailModal
+          key={selectedCard.id}
           card={selectedCard}
           onClose={() => setSelectedCard(null)}
           onUpdate={handleCardUpdated}
           onDelete={handleCardDeleted}
         />
       )}
+
 
       {/* Footer */}
       <footer style={{

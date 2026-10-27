@@ -1,21 +1,33 @@
 "use client";
 
 import React from "react";
-import { Download, CreditCard, Sparkles, RefreshCw } from "lucide-react";
+import { Download, CreditCard, Sparkles, RefreshCw, FileSpreadsheet } from "lucide-react";
 import confetti from "canvas-confetti";
-import { getCSVDownloadUrl } from "../utils/api";
+import { getCSVDownloadUrl, getExcelDownloadUrl } from "../utils/api";
 
 export default function Navbar({ cardCount = 0, onRefresh, backendStatus = "checking" }) {
-  const handleDownload = () => {
+  const handleDownloadExcel = () => {
     if (cardCount === 0) return;
     confetti({
-      particleCount: 80,
-      spread: 70,
+      particleCount: 90,
+      spread: 75,
+      origin: { y: 0.2 },
+      colors: ['#107c41', '#10b981', '#34d399', '#6ee7b7']
+    });
+    window.location.href = getExcelDownloadUrl();
+  };
+
+  const handleDownloadCSV = () => {
+    if (cardCount === 0) return;
+    confetti({
+      particleCount: 70,
+      spread: 65,
       origin: { y: 0.2 },
       colors: ['#6366f1', '#10b981', '#06b6d4', '#f59e0b']
     });
     window.location.href = getCSVDownloadUrl();
   };
+
 
   return (
     <header style={{
@@ -67,7 +79,7 @@ export default function Navbar({ cardCount = 0, onRefresh, backendStatus = "chec
               </span>
             </div>
             <p className="hide-on-mobile" style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0, whiteSpace: 'nowrap' }}>
-              Scan cards one by one • Preserve 100% raw text • Instant CSV export
+              Scan cards one by one • Preserve 100% raw text • Formatted Excel (.xlsx) & CSV
             </p>
           </div>
         </div>
@@ -111,17 +123,17 @@ export default function Navbar({ cardCount = 0, onRefresh, backendStatus = "chec
             <RefreshCw size={14} />
           </button>
 
-          {/* Download CSV Action */}
+          {/* Download Formatted Excel (.xlsx) Action */}
           <button
-            onClick={handleDownload}
+            onClick={handleDownloadExcel}
             disabled={cardCount === 0}
-            className="btn btn-emerald btn-sm"
-            id="download-csv-btn"
-            style={{ padding: '6px 12px', minHeight: 34 }}
-            title="Download CSV"
+            className="btn btn-excel btn-sm"
+            id="download-excel-btn"
+            style={{ padding: '6px 12px', minHeight: 34, fontWeight: 700 }}
+            title="Download formatted Excel spreadsheet (.xlsx) with styled headers & auto-filters"
           >
-            <Download size={15} />
-            <span className="hide-on-small-mobile">CSV</span>
+            <FileSpreadsheet size={15} />
+            <span className="hide-on-small-mobile">Excel</span>
             {cardCount > 0 && (
               <span style={{
                 background: 'rgba(255, 255, 255, 0.25)',
@@ -134,7 +146,21 @@ export default function Navbar({ cardCount = 0, onRefresh, backendStatus = "chec
               </span>
             )}
           </button>
+
+          {/* Download Standard CSV Action */}
+          <button
+            onClick={handleDownloadCSV}
+            disabled={cardCount === 0}
+            className="btn btn-secondary btn-sm"
+            id="download-csv-btn"
+            style={{ padding: '6px 10px', minHeight: 34, fontSize: 12 }}
+            title="Download raw CSV file"
+          >
+            <Download size={14} />
+            <span className="hide-on-small-mobile">CSV</span>
+          </button>
         </div>
+
 
       </div>
     </header>

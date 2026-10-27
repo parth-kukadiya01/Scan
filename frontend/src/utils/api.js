@@ -124,6 +124,18 @@ export function getSingleCardCSVUrl(cardId) {
   return `${API_BASE}/api/cards/${cardId}/csv`;
 }
 
+export function getExcelDownloadUrl(cardIds = null) {
+  if (cardIds && cardIds.length > 0) {
+    return `${API_BASE}/api/export/excel?ids=${cardIds.join(",")}`;
+  }
+  return `${API_BASE}/api/export/excel`;
+}
+
+export function getSingleCardExcelUrl(cardId) {
+  return `${API_BASE}/api/cards/${cardId}/excel`;
+}
+
+
 export function getImageUrl(path) {
   if (!path) return null;
   if (path.startsWith("http")) return path;

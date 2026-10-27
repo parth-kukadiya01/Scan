@@ -35,7 +35,6 @@ COMPANY_SUFFIXES = [
 HONORIFICS = ['dr.', 'dr', 'mr.', 'mr', 'ms.', 'ms', 'mrs.', 'mrs', 'prof.', 'prof', 'eng.', 'adv.', 'ca', 'cpa']
 CREDENTIALS = ['md', 'phd', 'esq', 'cpa', 'mba', 'jd', 'dds', 'dvm', 'faap', 'facs']
 
-# Marketing slogans, banners, and delivery notices that must NEVER be misidentified as a person name
 NON_NAME_PHRASES = [
     'free home', 'home delivery', 'free delivery', 'free shipping', 'fast delivery',
     'delivery in', 'delivery', 'in surat', 'specialist in', 'all types', 'all kinds',
@@ -44,6 +43,22 @@ NON_NAME_PHRASES = [
     'govt approved', 'estd', 'since', 'open 7 days', 'visit us', 'call us', 'contact us',
     'follow us', 'order now', 'cash on delivery', 'best quality', 'satisfaction guaranteed',
     'office address', 'address', 'location', 'phone', 'email', 'website', 'web'
+]
+
+PRODUCT_LIST_WORDS = [
+    'gold', 'silver', 'diamond', 'jeweller', 'jewelers', 'jewellery', 'lewellers',
+    'hallmark', 'bis 916', 'kdm', 'platinum', 'gemstones', 'watches', 'textile',
+    'garments', 'fabrics', 'hardware', 'electronics', 'furniture'
+]
+
+NON_COMPANY_PHRASES = [
+    'free home', 'home delivery', 'free delivery', 'free shipping', 'fast delivery',
+    'delivery in', 'specialist in', 'all types', 'all kinds',
+    'authorized dealer', 'exclusive showroom', 'wholesale & retail', 'retail & wholesale',
+    'sales & service', 'manufacturers', 'importers & exporters', 'iso certified',
+    'govt approved', 'open 7 days', 'visit us', 'call us', 'contact us',
+    'follow us', 'order now', 'cash on delivery', 'best quality', 'satisfaction guaranteed',
+    'office address', 'location', 'phone', 'email', 'website', 'web'
 ]
 
 INDIAN_AND_GLOBAL_CITIES = [
@@ -389,11 +404,11 @@ def _parse_with_spatial_layout(raw_text: str, lines_data: List[Dict[str, Any]], 
 
         lower = cand_text.lower()
 
-        # Strict rejection for delivery/marketing banners
-        if any(np in lower for np in NON_NAME_PHRASES):
+        # Strict rejection for delivery/marketing banners and product lines
+        if any(np in lower for np in NON_NAME_PHRASES) or any(pw in lower for pw in PRODUCT_LIST_WORDS):
             continue
 
-        if re.search(r'\d', cand_text) or re.search(r'[@\/\\#\$%\^&\*\<\>\{\}\[\]_—|]', cand_text):
+        if re.search(r'\d', cand_text) or re.search(r'[@\/\\#\$%\^&\*\<\>\{\}\[\]_—|•·★◆+]', cand_text) or any(c in text for c in ['•', '·', '★', '◆', '+', '&', '✓']):
             continue
 
         words = [w for w in cand_text.split() if len(w) > 1]
@@ -432,7 +447,9 @@ def _parse_with_spatial_layout(raw_text: str, lines_data: List[Dict[str, Any]], 
             score += 8.0
 
         y = l.get("y", 0.5)
-        if 0.35 <= y <= 0.85:
+        if y >= 0.70:
+            score += 10.0 # Top area of card where owner names typically reside
+        elif 0.35 <= y < 0.70:
             score += 5.0
 
         # Title proximity boost
@@ -451,6 +468,14 @@ def _parse_with_spatial_layout(raw_text: str, lines_data: List[Dict[str, Any]], 
             name = name_candidates[0][2]
             used_indices.add(name_idx)
 
+            # Check if there is a 2nd co-owner / partner on the same header line (e.g. SUNIL SONI and SAGAR SONI)
+            if len(name_candidates) > 1 and name_candidates[1][0] >= 10.0:
+                y1 = valid_lines[name_idx].get("y", 0.0)
+                y2 = valid_lines[name_candidates[1][1]].get("y", 0.0)
+                if abs(y1 - y2) < 0.06:
+                    name = f"{name}, {name_candidates[1][2]}"
+                    used_indices.add(name_candidates[1][1])
+
     # 5. Detect Company Name
     company = ""
     company_candidates = []
@@ -461,7 +486,7 @@ def _parse_with_spatial_layout(raw_text: str, lines_data: List[Dict[str, Any]], 
         text = l.get("text", "").strip()
         lower = text.lower()
 
-        if any(np in lower for np in NON_NAME_PHRASES):
+        if any(np in lower for np in NON_COMPANY_PHRASES):
             continue
 
         # Ignore social handles like soilras42
@@ -469,8 +494,11 @@ def _parse_with_spatial_layout(raw_text: str, lines_data: List[Dict[str, Any]], 
             continue
 
         score = 0.0
+        font_h = l.get("height", 0.0)
+        score += font_h * 60.0
+
         if any(re.search(rf'\b{re.escape(s)}\b', lower) for s in COMPANY_SUFFIXES):
-            score += 20.0
+            score += 25.0
 
         if brand_domain and brand_domain in lower and not re.search(r'\d', text):
             score += 25.0
@@ -570,7 +598,7 @@ def _parse_with_heuristics(raw_text: str, emails: List[str]) -> Dict[str, Any]:
         if idx in used_indices:
             continue
         lower = line.lower()
-        if any(np in lower for np in NON_NAME_PHRASES):
+        if any(np in lower for np in NON_COMPANY_PHRASES):
             continue
         if re.search(r'^[a-zA-Z]+\d{2,}$', line) or line.startswith('@'):
             continue
@@ -594,9 +622,9 @@ def _parse_with_heuristics(raw_text: str, emails: List[str]) -> Dict[str, Any]:
         if idx in used_indices:
             continue
         lower = line.lower()
-        if any(np in lower for np in NON_NAME_PHRASES):
+        if any(np in lower for np in NON_NAME_PHRASES) or any(pw in lower for pw in PRODUCT_LIST_WORDS):
             continue
-        if re.search(r'\d', line) or re.search(r'[@\/\\#\$%\^&\*\<\>\{\}\[\]_—]', line):
+        if re.search(r'\d', line) or re.search(r'[@\/\\#\$%\^&\*\<\>\{\}\[\]_—|•·★◆+]', line) or any(c in line for c in ['•', '·', '★', '◆', '+', '&', '✓']):
             continue
         if brand_domain and brand_domain in lower:
             continue
@@ -606,8 +634,9 @@ def _parse_with_heuristics(raw_text: str, emails: List[str]) -> Dict[str, Any]:
             continue
 
         words = [w for w in line.split() if len(w) > 1]
-        if 2 <= len(words) <= 4 and len(line) <= 40:
-            score = 3 if idx == 0 else 2 if idx == 1 else 1
+        if 2 <= len(words) <= 4 and len(line) <= 45:
+            # Base score: names near the top of the card get strong initial score
+            score = 6 if idx == 0 else 5 if idx == 1 else 3
             if title_idx != -1 and abs(idx - title_idx) == 1:
                 score += 8
             if any(lower.startswith(h) for h in HONORIFICS):

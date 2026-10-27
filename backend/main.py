@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from ocr_engine import run_card_scanner, run_ocr_on_image, SCANNER_TOOL_BIN
 from card_parser import parse_card_text
 from csv_service import generate_csv_bytes
+from excel_service import generate_excel_bytes
 import storage
 from sample_cards import SAMPLE_PRESETS, generate_sample_card_image
 from gemini_service import get_active_gemini_key, set_gemini_key
@@ -265,6 +266,57 @@ def download_single_card_csv(card_id: str):
             "Cache-Control": "no-cache"
         }
     )
+
+@app.get("/api/export/excel")
+def download_excel_export(ids: Optional[str] = Query(None)):
+    """
+    Downloads properly styled Microsoft Excel (.xlsx) file containing all cards or specific cards.
+    Includes styled dark navy headers, auto-filters, freeze panes, text-formatted phone numbers,
+    word wrapping for addresses/raw text, and alternating zebra rows.
+    """
+    cards = storage.load_cards()
+    filename = "business_cards.xlsx"
+
+    if ids:
+        id_list = [i.strip() for i in ids.split(",") if i.strip()]
+        cards = [c for c in cards if c.get("id") in id_list]
+        if len(id_list) == 1:
+            first_card = cards[0] if cards else {}
+            safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', first_card.get("name") or first_card.get("company") or id_list[0]).strip('_')
+            filename = f"card_{safe_name}.xlsx"
+        else:
+            filename = f"selected_business_cards_{len(cards)}.xlsx"
+
+    excel_bytes = generate_excel_bytes(cards)
+
+    return Response(
+        content=excel_bytes,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f"attachment; filename={filename}",
+            "Cache-Control": "no-cache"
+        }
+    )
+
+@app.get("/api/cards/{card_id}/excel")
+def download_single_card_excel(card_id: str):
+    """Downloads a single specific card as an individual formatted Excel (.xlsx) file."""
+    cards = storage.load_cards()
+    card = next((c for c in cards if c.get("id") == card_id), None)
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found")
+
+    safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', card.get("name") or card.get("company") or card_id).strip('_')
+    excel_bytes = generate_excel_bytes([card])
+    return Response(
+        content=excel_bytes,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f"attachment; filename=card_{safe_name}.xlsx",
+            "Cache-Control": "no-cache"
+        }
+    )
+
 
 @app.get("/api/images/{filename}")
 def get_card_image(filename: str):

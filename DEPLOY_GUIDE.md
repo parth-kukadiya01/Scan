@@ -80,7 +80,8 @@ Your local git repository is already initialized and committed on branch `main`.
 1. Open your Vercel URL on your computer or mobile phone.
 2. In the top navbar, you will see the green dot: **FastAPI Engine Active**.
 3. Click any **Instant Demo** card (e.g. "Tech Executive") to verify end-to-end OCR and CSV addition!
-4. Use your mobile phone camera to snap a business card in real-time, click **Download CSV**, and export your contacts!
+4. Use your mobile phone camera to snap a business card in real-time, click **Download Excel (.xlsx)** or **Download CSV**, and export your contacts!
+
 
 ---
 

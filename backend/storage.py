@@ -4,12 +4,14 @@ import uuid
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from csv_service import write_cards_to_csv_file, append_single_card_to_csv_file
+from excel_service import write_cards_to_excel_file
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 IMAGES_DIR = os.path.join(DATA_DIR, "images")
 CARDS_FILE = os.path.join(DATA_DIR, "cards.json")
 CSV_FILE = os.path.join(DATA_DIR, "business_cards.csv")
+EXCEL_FILE = os.path.join(DATA_DIR, "business_cards.xlsx")
 
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
@@ -24,12 +26,17 @@ def load_cards() -> List[Dict[str, Any]]:
         return []
 
 def save_cards(cards: List[Dict[str, Any]]) -> None:
-    """Saves cards to both JSON file and the master CSV file."""
+    """Saves cards to both JSON file, the master CSV file, and the master Excel file."""
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(CARDS_FILE, "w", encoding="utf-8") as f:
         json.dump(cards, f, indent=2, ensure_ascii=False)
-    # Synchronize master CSV file
+    # Synchronize master CSV file and Excel file
     write_cards_to_csv_file(cards, CSV_FILE)
+    try:
+        write_cards_to_excel_file(cards, EXCEL_FILE)
+    except Exception as e:
+        print(f"Warning: Failed to write master Excel file: {e}")
+
 
 def add_card(
     card_data: Dict[str, Any],

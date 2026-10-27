@@ -36,10 +36,11 @@ Designed to scan business cards one by one (via live camera or batch file upload
 - **1-Click Instant Demo Cards**:
   - Pre-rendered test cards (Tech Executive, Medical Director, Design Principal) to test the ML scanner and CSV generation immediately.
 
-- **Real-Time CSV Export Engine**:
-  - Cards are appended directly to `backend/data/business_cards.csv`.
-  - **RFC-4180 Compliant** with **UTF-8 Byte Order Mark (BOM)** ensuring Microsoft Excel, Numbers, and Google Sheets open the file with zero character corruption.
-  - 1-Click "Download CSV" and "Copy CSV to Clipboard" buttons.
+- **Professional Microsoft Excel (.xlsx) & Real-Time CSV Export Engine**:
+  - **Formatted Excel (.xlsx)**: Generates high-end Microsoft Excel spreadsheets featuring styled dark navy headers, sticky frozen header panes (`A2`), automatic column filtering, strict text formatting for phone numbers (preventing scientific notation `1.23E+11` or lost leading zeros), word-wrapped multiline addresses and OCR text, auto-fitted column widths, and alternating zebra row striping.
+  - **RFC-4180 Compliant CSV**: Master CSV file (`backend/data/business_cards.csv`) with UTF-8 Byte Order Mark (BOM) for universal spreadsheet compatibility.
+  - 1-Click "Download Excel (.xlsx)", "Download CSV", per-card exports, and "Copy CSV to Clipboard" with celebratory confetti bursts.
+
 
 - **Obsidian Glassmorphic UI**:
   - Rich obsidian theme (`#090d16`), electric indigo & emerald accents, sound effects via Web Audio API, and confetti bursts on export.

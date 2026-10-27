@@ -18,11 +18,11 @@ export default function FileUploader({
 
   const processFileList = async (files) => {
     const validFiles = Array.from(files).filter((file) =>
-      file.type.startsWith("image/")
+      file.type.startsWith("image/") || /\.(jpe?g|png|webp|heic|heif|bmp|tiff)$/i.test(file.name)
     );
 
     if (validFiles.length === 0) {
-      if (onError) onError("Please upload valid image files (PNG, JPG, WEBP)");
+      if (onError) onError("Please upload valid image files (PNG, JPG, WEBP, HEIC)");
       return;
     }
 
@@ -130,7 +130,7 @@ export default function FileUploader({
           ref={fileInputRef}
           onChange={handleFileChange}
           multiple
-          accept="image/*"
+          accept="image/*,.heic,.heif"
           style={{ display: "none" }}
         />
 

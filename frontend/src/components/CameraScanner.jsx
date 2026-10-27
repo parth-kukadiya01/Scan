@@ -19,14 +19,24 @@ export default function CameraScanner({
   const [statusMessage, setStatusMessage] = useState("");
   const [continuousMode, setContinuousMode] = useState(false);
   const [hasPermissionError, setHasPermissionError] = useState(false);
+  const [permissionErrorMsg, setPermissionErrorMsg] = useState("");
   const [lastDewarped, setLastDewarped] = useState(false);
 
   // Start Camera Stream
   const startCamera = async () => {
     setHasPermissionError(false);
+    setPermissionErrorMsg("");
     try {
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
+      }
+
+      if (typeof navigator === "undefined" || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error(
+          typeof window !== "undefined" && window.isSecureContext === false
+            ? "Camera requires a secure context (HTTPS or localhost). If opening from phone via IP, use File Upload."
+            : "Camera is not supported on this browser. Please use File Upload."
+        );
       }
 
       const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -48,6 +58,7 @@ export default function CameraScanner({
     } catch (err) {
       console.error("Camera access error:", err);
       setHasPermissionError(true);
+      setPermissionErrorMsg(err.message || "Camera denied. Please grant camera access in browser settings or use File Upload.");
       setCameraActive(false);
     }
   };
@@ -211,7 +222,7 @@ export default function CameraScanner({
           gap: 8
         }}>
           <AlertCircle size={15} style={{ flexShrink: 0 }} />
-          <span>Camera denied. Enable camera permissions in your mobile browser or use File Upload.</span>
+          <span>{permissionErrorMsg || "Camera denied. Enable camera permissions in your browser or use File Upload."}</span>
         </div>
       )}
 

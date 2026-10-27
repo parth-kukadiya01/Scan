@@ -15,12 +15,6 @@ export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
   const [saving, setSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      loadConfig();
-    }
-  }, [isOpen]);
-
   const loadConfig = async () => {
     setLoading(true);
     try {
@@ -32,6 +26,13 @@ export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      loadConfig();
+    }
+  }, [isOpen]);
+
 
   const handleSaveKey = async (e) => {
     e.preventDefault();

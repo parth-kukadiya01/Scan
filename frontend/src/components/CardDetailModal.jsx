@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Save, Trash2, Copy, Check, ExternalLink, Image as ImageIcon, FileText, Zap, Sparkles, RefreshCw, ScanLine, Download } from "lucide-react";
-import { updateCard, deleteCard, reparseCard, getImageUrl, getSingleCardCSVUrl } from "../utils/api";
+import { X, Save, Trash2, Copy, Check, ExternalLink, Image as ImageIcon, FileText, Zap, Sparkles, RefreshCw, ScanLine, Download, FileSpreadsheet } from "lucide-react";
+import { updateCard, deleteCard, reparseCard, getImageUrl, getSingleCardCSVUrl, getSingleCardExcelUrl } from "../utils/api";
+
 
 export default function CardDetailModal({ card, onClose, onUpdate, onDelete }) {
-  if (!card) return null;
-
   const [isMobileScreen, setIsMobileScreen] = useState(false);
   useEffect(() => {
     const check = () => setIsMobileScreen(window.innerWidth < 768);
@@ -16,24 +15,28 @@ export default function CardDetailModal({ card, onClose, onUpdate, onDelete }) {
   }, []);
 
   const [formData, setFormData] = useState({
-    name: card.name || "",
-    title: card.title || "",
-    company: card.company || "",
-    phone: card.phone || "",
-    email: card.email || "",
-    website: card.website || "",
-    address: card.address || "",
-    other_details: card.other_details || "",
-    raw_text: card.raw_text || ""
+    name: card?.name || "",
+    title: card?.title || "",
+    company: card?.company || "",
+    phone: card?.phone || "",
+    email: card?.email || "",
+    website: card?.website || "",
+    address: card?.address || "",
+    other_details: card?.other_details || "",
+    raw_text: card?.raw_text || ""
   });
 
   const [selectedImageTab, setSelectedImageTab] = useState(
-    card.dewarped_image_url ? "dewarped" : "original"
+    card?.dewarped_image_url ? "dewarped" : "original"
   );
   const [activeTab, setActiveTab] = useState("fields"); // 'fields' | 'raw'
   const [saving, setSaving] = useState(false);
   const [reparsing, setReparsing] = useState(false);
   const [copiedRaw, setCopiedRaw] = useState(false);
+
+  if (!card) return null;
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -452,7 +455,7 @@ export default function CardDetailModal({ card, onClose, onUpdate, onDelete }) {
           gap: 10,
           background: "rgba(15, 23, 42, 0.4)"
         }}>
-          <div style={{ display: "flex", gap: 8, width: isMobileScreen ? "100%" : "auto" }}>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", width: isMobileScreen ? "100%" : "auto" }}>
             <button
               onClick={handleDelete}
               className="btn btn-danger btn-sm"
@@ -464,16 +467,29 @@ export default function CardDetailModal({ card, onClose, onUpdate, onDelete }) {
 
             <button
               onClick={() => {
+                window.location.href = getSingleCardExcelUrl(card.id);
+              }}
+              className="btn btn-excel btn-sm"
+              style={{ flex: isMobileScreen ? 1 : "initial", minHeight: 36, fontSize: 12, fontWeight: 700 }}
+              title="Download this specific card as formatted Excel (.xlsx)"
+            >
+              <FileSpreadsheet size={13} />
+              <span>Card Excel</span>
+            </button>
+
+            <button
+              onClick={() => {
                 window.location.href = getSingleCardCSVUrl(card.id);
               }}
-              className="btn btn-emerald btn-sm"
+              className="btn btn-secondary btn-sm"
               style={{ flex: isMobileScreen ? 1 : "initial", minHeight: 36, fontSize: 12 }}
               title="Download this specific card as an individual CSV"
             >
               <Download size={13} />
-              <span>Card CSV</span>
+              <span>CSV</span>
             </button>
           </div>
+
 
           <div style={{ display: "flex", gap: 8, width: isMobileScreen ? "100%" : "auto" }}>
             <button
