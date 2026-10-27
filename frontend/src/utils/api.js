@@ -1,4 +1,10 @@
 export function getApiBase() {
+  if (typeof window !== "undefined") {
+    const customUrl = localStorage.getItem("cardpulse_api_url");
+    if (customUrl && customUrl.trim()) {
+      return customUrl.trim().replace(/\/+$/, "");
+    }
+  }
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
   }

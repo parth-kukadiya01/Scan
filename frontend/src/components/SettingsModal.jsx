@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { X, Cpu, Key, Sparkles, Check, AlertCircle, RefreshCw, ShieldCheck, Zap } from "lucide-react";
-import { fetchConfig, updateConfig } from "../utils/api";
+import { fetchConfig, updateConfig, getApiBase } from "../utils/api";
+import { Link2 } from "lucide-react";
 
 export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
   const [geminiKey, setGeminiKey] = useState("");
+  const [backendUrl, setBackendUrl] = useState("");
   const [config, setConfig] = useState({
     apple_vision_ml_available: true,
     gemini_available: false,
@@ -13,6 +15,7 @@ export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingUrl, setSavingUrl] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
 
   const loadConfig = async () => {
@@ -29,9 +32,34 @@ export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
 
   useEffect(() => {
     if (isOpen) {
+      if (typeof window !== "undefined") {
+        setBackendUrl(localStorage.getItem("cardpulse_api_url") || "");
+      }
       loadConfig();
     }
   }, [isOpen]);
+
+  const handleSaveBackendUrl = (e) => {
+    e.preventDefault();
+    setSavingUrl(true);
+    const trimmed = backendUrl.trim().replace(/\/+$/, "");
+    if (trimmed) {
+      localStorage.setItem("cardpulse_api_url", trimmed);
+      setStatusMessage({
+        type: "success",
+        text: `Backend URL saved: ${trimmed}`
+      });
+    } else {
+      localStorage.removeItem("cardpulse_api_url");
+      setStatusMessage({
+        type: "success",
+        text: "Reset backend URL to default."
+      });
+    }
+    loadConfig();
+    if (onConfigSaved) onConfigSaved();
+    setSavingUrl(false);
+  };
 
 
   const handleSaveKey = async (e) => {
@@ -181,6 +209,42 @@ export default function SettingsModal({ isOpen, onClose, onConfigSaved }) {
               <span>{statusMessage.text}</span>
             </div>
           )}
+
+          {/* Backend API Server URL Form (Especially for Vercel Deployments) */}
+          <form onSubmit={handleSaveBackendUrl} style={{ marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid var(--border-subtle)" }}>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Link2 size={14} color="#34d399" />
+                  Backend API URL (Render / ngrok / Tunnel)
+                </span>
+                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                  Current: {getApiBase()}
+                </span>
+              </label>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  type="text"
+                  placeholder="https://your-backend.onrender.com or https://xxxx.ngrok-free.dev"
+                  value={backendUrl}
+                  onChange={(e) => setBackendUrl(e.target.value)}
+                  className="input-field"
+                  style={{ fontFamily: "var(--font-mono)", fontSize: 12, flex: 1 }}
+                />
+                <button
+                  type="submit"
+                  disabled={savingUrl}
+                  className="btn btn-secondary"
+                  style={{ minWidth: 90 }}
+                >
+                  {savingUrl ? <RefreshCw size={13} className="spinner" /> : "Connect"}
+                </button>
+              </div>
+              <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 6 }}>
+                Required when running on Vercel. Connects this browser to your live FastAPI backend.
+              </p>
+            </div>
+          </form>
 
           {/* Gemini API Key Form */}
           <form onSubmit={handleSaveKey}>

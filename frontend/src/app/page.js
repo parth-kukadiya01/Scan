@@ -144,6 +144,41 @@ export default function HomePage() {
 
       {/* Main Content */}
       <main className="container" style={{ flex: 1, paddingBottom: 60, paddingTop: 16 }}>
+        {/* Backend Offline Warning Banner */}
+        {backendStatus === "offline" && (
+          <div style={{
+            padding: "12px 18px",
+            background: "rgba(244, 63, 94, 0.12)",
+            border: "1px solid rgba(244, 63, 94, 0.35)",
+            borderRadius: "var(--radius-md)",
+            marginBottom: 16,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 10
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <AlertCircle size={18} color="#fda4af" style={{ flexShrink: 0 }} />
+              <div>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#fda4af" }}>
+                  Cannot connect to FastAPI Backend
+                </p>
+                <p style={{ margin: 0, fontSize: 11, color: "var(--text-muted)" }}>
+                  If deployed on Vercel, connect your live Render or ngrok backend URL in Settings.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="btn btn-primary btn-sm"
+              style={{ fontSize: 12, padding: "6px 14px" }}
+            >
+              Open Settings & Connect
+            </button>
+          </div>
+        )}
+
         {/* ML Scanner Engine Selector Bar */}
         <EngineSelectorBar
           selectedEngine={selectedEngine}
